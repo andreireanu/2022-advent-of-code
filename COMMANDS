@@ -1,0 +1,12 @@
+------------------
+RUST COMMANDS
+------------------
+cargo new --lib proj
+
+cargo run --bin file
+
+----------------
+WATCH OUTPUT
+----------------
+cargo watch -x "run --bin file"
+
