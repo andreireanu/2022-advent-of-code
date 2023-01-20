@@ -46,11 +46,11 @@ pub fn calculate_score_second(s: &String) -> u16 {
             char_counts.entry(c).and_modify(|counter| {if counter == &1 {*counter += 1}});
         }
         for c in arr[2].chars() {
-            char_counts.entry(c).and_modify(|counter| {if counter == &2 {*counter += 3}});
+            char_counts.entry(c).and_modify(|counter| {if counter == &2 {*counter += 1}});
         }
         let temp = char_counts
             .into_iter()
-            .filter(|&(_k, v)| v >= 3  )
+            .filter(|&(_k, v)| v == 3  )
             .map(|(k, _v)| char_to_val(k))
             .sum::<u16>();
         sum += temp;

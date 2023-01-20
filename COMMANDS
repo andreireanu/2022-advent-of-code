@@ -1,12 +1,16 @@
 ------------------
-RUST COMMANDS
+NEW LIB PROJECT
 ------------------
 cargo new --lib proj
-
-cargo run --bin file
+ 
+------------------
+TEST
+------------------
+cargo watch -x "test --lib"
 
 ----------------
 WATCH OUTPUT
 ----------------
 cargo watch -x "run --bin file"
+
 
