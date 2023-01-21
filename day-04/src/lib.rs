@@ -3,7 +3,7 @@ pub fn calculate_score_first(s: &str) -> u16 {
      .lines()
      .map(|line|  {
         let line_vec: Vec<u16> = line
-         .split([',', '-'])
+         .split([',','-'])
          .map(|value| {
             value.parse::<u16>().unwrap()
          })
@@ -39,11 +39,7 @@ pub fn calculate_score_first(s: &str) -> u16 {
              })
          .sum()
         }
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
+ 
 #[cfg(test)]
 mod tests {
     use super::*;
