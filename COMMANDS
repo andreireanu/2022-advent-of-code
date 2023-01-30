@@ -12,5 +12,5 @@ cargo watch -x "test --lib"
 WATCH OUTPUT
 ----------------
 cargo watch -x "run --bin file"
-cargo watch -x "run --bin day-0"
+cargo watch -x "run --bin day-07"
 cargo watch -x "test --lib"
