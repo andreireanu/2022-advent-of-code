@@ -93,7 +93,6 @@ pub fn part_two(s: &str) -> usize {
         };
     });
     let required = dir_sizes["/"] - 40000000;
-    dbg!(required);
     let values_iter = dir_sizes.into_values();
     let mut filtered = values_iter
         .filter(|&value| value >= required)
