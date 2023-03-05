@@ -11,13 +11,13 @@ fn nom_monkey(input: &str) -> IResult<&str, usize> {
     Ok((dummy, id_usize))
   }
 
-  fn nom_items(input: &str) -> IResult<&str, Vec<u16>> {
+  fn nom_items(input: &str) -> IResult<&str, Vec<u32>> {
     let (input, err) = tag("  Starting items: ")(input)?;
     let splt = input.split(", ").collect::<Vec<&str>>();
     let parsed = splt
         .into_iter()
-        .map( |element| element.parse::<u16>().unwrap())
-        .collect::<Vec<u16>>();
+        .map( |element| element.parse::<u32>().unwrap())
+        .collect::<Vec<u32>>();
     Ok((err, parsed))
   }
   
@@ -27,9 +27,9 @@ fn nom_monkey(input: &str) -> IResult<&str, usize> {
     Ok((err, splt))
     }
 
-fn nom_divisor(input: &str) -> IResult<&str, u16>  {
+fn nom_divisor(input: &str) -> IResult<&str, u32>  {
     let (divisor, err) = tag("  Test: divisible by ")(input)?;
-    let out = divisor.parse::<u16>().unwrap();
+    let out = divisor.parse::<u32>().unwrap();
     Ok((err, out))
     }
 
@@ -45,72 +45,106 @@ fn nom_false(input: &str) -> IResult<&str, usize>  {
     Ok((err, out))
     }
 
-pub fn part_one(s: &str) -> isize {
-    let monkeys: &mut Vec<Vec<u16>> = &mut vec![vec![];7];
-    dbg!(&monkeys);
-    let lines = s.lines().collect::<Vec<&str>>();
-    let chunks = lines.chunks(7);
-    for chunk in chunks.into_iter() {
-        dbg!(&chunk);
-        let (_,monkey) = nom_monkey(chunk[0]).unwrap();
-        dbg!(&monkey);
-        let (_, items) = nom_items(chunk[1]).unwrap();
-        dbg!(&items);
-        let (_, operation) = nom_operation(chunk[2]).unwrap();
-        dbg!(&operation);
-        let (_, divisor) = nom_divisor(chunk[3]).unwrap();
-        dbg!(&divisor);
-        let (_, true_val) = nom_true(chunk[4]).unwrap();
-        dbg!(&true_val);
-        let (_, false_val) = nom_false(chunk[5]).unwrap();
-        dbg!(&false_val);
-        for item in items.into_iter() {
-            monkeys[monkey].push(item);
-        };
-
-        for monkey in monkeys.into_iter() {
-            for item in monkey.into_iter() {
-                dbg!(&item);
-                let value = match operation[1].parse::<u16>() {
-                    Ok(result) => { result },
-                    Err(_) => { *item},
+pub fn part_one(s: &str) -> usize {
+    let monkeys: &mut Vec<Vec<u32>> = &mut vec![vec![];9];
+    let count: &mut Vec<usize> = &mut vec![0;9];
+    for round in 0..20 {
+        let lines = s.lines().collect::<Vec<&str>>();
+        let chunks = lines.chunks(7);
+        for chunk in chunks.into_iter() {
+            let (_,monkey) = nom_monkey(chunk[0]).unwrap();
+            let (_, items) = nom_items(chunk[1]).unwrap();
+            let (_, operation) = nom_operation(chunk[2]).unwrap();
+            let (_, divisor) = nom_divisor(chunk[3]).unwrap();
+            let (_, true_val) = nom_true(chunk[4]).unwrap();
+            let (_, false_val) = nom_false(chunk[5]).unwrap();
+            if round == 0 {
+                for item in items.into_iter() {
+                    monkeys[monkey].push(item);
                 };
-                dbg!(&value);
+            };
+            count[monkey] += monkeys[monkey].len();
+            for i in 0..monkeys[monkey].len()  {
+                let item = monkeys[monkey][i];
+                let value = match operation[1].parse::<u32>() {
+                    Ok(result) => { result },
+                    Err(_) => { item},
+                };
                 let result = match operation[0] {
                     "+" => {
-                        if ((*item + value) / 3) % divisor == 0 {
-                            true
-                        } else {
-                            false
-                        }
-                    },
+                        (item + value) / 3  
+                        },
                     "*" => {
-                        if  ((*item * value) / 3) % divisor == 0 {
-                            true
-                        } else {
-                            false
-                        }
+                        (item * value) / 3
                     },
-                    _ => { false }
+                    _ => { 0 }
                 };
-                dbg!(&result);
-                match result {
+                match result % divisor == 0 {
                     true => { 
-                        monkeys[true_val].push(*item);
+                        monkeys[true_val].push(result);
                     },
                     false => { 
-                        monkeys[false_val].push(*item);
+                        monkeys[false_val].push(result);
                     },
                 }
             }
-        }
-    }
-    dbg!(&monkeys);
-    0
+            monkeys[monkey].clear();
+        };
+    };
+    count.sort_by(|a, b| b.partial_cmp(a).unwrap());
+    dbg!(&count);
+    count[0] * count[1]
 }
 
-pub fn part_two(s: &str) -> isize {
-    0
+pub fn part_two(s: &str) -> usize {
+    let monkeys: &mut Vec<Vec<u32>> = &mut vec![vec![];9];
+    let count: &mut Vec<usize> = &mut vec![0;9];
+    for round in 0..20 {
+        let lines = s.lines().collect::<Vec<&str>>();
+        let chunks = lines.chunks(7);
+        for chunk in chunks.into_iter() {
+            let (_,monkey) = nom_monkey(chunk[0]).unwrap();
+            let (_, items) = nom_items(chunk[1]).unwrap();
+            let (_, operation) = nom_operation(chunk[2]).unwrap();
+            let (_, divisor) = nom_divisor(chunk[3]).unwrap();
+            let (_, true_val) = nom_true(chunk[4]).unwrap();
+            let (_, false_val) = nom_false(chunk[5]).unwrap();
+            if round == 0 {
+                for item in items.into_iter() {
+                    monkeys[monkey].push(item);
+                };
+            };
+            count[monkey] += monkeys[monkey].len();
+            for i in 0..monkeys[monkey].len()  {
+                let item = monkeys[monkey][i];
+                let value = match operation[1].parse::<u32>() {
+                    Ok(result) => { result },
+                    Err(_) => { item},
+                };
+                let result = match operation[0] {
+                    "+" => {
+                        (item + value) / 3  
+                        },
+                    "*" => {
+                        (item * value) / 3
+                    },
+                    _ => { 0 }
+                };
+                match result % divisor == 0 {
+                    true => { 
+                        monkeys[true_val].push(result);
+                    },
+                    false => { 
+                        monkeys[false_val].push(result);
+                    },
+                }
+            }
+            monkeys[monkey].clear();
+        };
+    };
+    count.sort_by(|a, b| b.partial_cmp(a).unwrap());
+    dbg!(&count);
+    count[0] * count[1]
 }
 
 #[cfg(test)]
@@ -131,29 +165,55 @@ Monkey 1:
   Operation: new = old + 6
   Test: divisible by 19
     If true: throw to monkey 2
-    If false: throw to monkey 0";
+    If false: throw to monkey 0
 
-// Monkey 2:
-//   Starting items: 79, 60, 97
-//   Operation: new = old * old
-//   Test: divisible by 13
-//     If true: throw to monkey 1
-//     If false: throw to monkey 3
+Monkey 2:
+  Starting items: 79, 60, 97
+  Operation: new = old * old
+  Test: divisible by 13
+    If true: throw to monkey 1
+    If false: throw to monkey 3
 
-// Monkey 3:
-//   Starting items: 74
-//   Operation: new = old + 3
-//   Test: divisible by 17
-//     If true: throw to monkey 0
-//     If false: throw to monkey 1";
+Monkey 3:
+  Starting items: 74
+  Operation: new = old + 3
+  Test: divisible by 17
+    If true: throw to monkey 0
+    If false: throw to monkey 1";
         let result = part_one(&input);
-        assert_eq!(result, 13140);
+        assert_eq!(result, 10605);
     }
 
     #[test]
     fn test_part_two() {
-        let input = "0";
+        let input = "Monkey 0:
+  Starting items: 79, 98
+  Operation: new = old * 19
+  Test: divisible by 23
+    If true: throw to monkey 2
+    If false: throw to monkey 3
+
+Monkey 1:
+  Starting items: 54, 65, 75, 74
+  Operation: new = old + 6
+  Test: divisible by 19
+    If true: throw to monkey 2
+    If false: throw to monkey 0
+
+Monkey 2:
+  Starting items: 79, 60, 97
+  Operation: new = old * old
+  Test: divisible by 13
+    If true: throw to monkey 1
+    If false: throw to monkey 3
+
+Monkey 3:
+  Starting items: 74
+  Operation: new = old + 3
+  Test: divisible by 17
+    If true: throw to monkey 0
+    If false: throw to monkey 1";
         let result = part_two(&input);
-        assert_eq!(result, 2);
+        assert_eq!(result, 2713310158);
     }
 }
